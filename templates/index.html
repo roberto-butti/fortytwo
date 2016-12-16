@@ -11,7 +11,7 @@
 		<form class="searchform" action="" autocomplete="off">
 			<h1>42</h1>
 			<div class="searchform__wrapper">
-				<input name="text" type="text" autofocus="true"  class="main-input">
+				<input name="text" type="text" autofocus="true"  class="main-input" placeholder="Cerca">
 				<button class="submit-button" type="submit" style="display: none;"></button>
 				<span class="voice-button"></span>
 			</div>
@@ -39,15 +39,34 @@
 		var voiceButton = document.querySelector('.voice-button');
 		var submitButton = document.querySelector('.submit-button');
 		var voiceStarted = false;
+		var latestQuestionsWrapper = document.querySelector('.last_questions__list');
+
+		var attachLatestQuestionsEvents = function() {
+			Array.prototype.forEach.call(document.querySelectorAll('.last_questions__list a'),function(el) {
+				el.addEventListener('click', function(e){
+					e.preventDefault();
+					input.value = el.innerHTML;
+					sendForm();
+				});
+			})
+		}
 
 		var sendForm = function() {
 			nanoajax.ajax({
 				url:formUrl,
 				method: 'POST',
+				responseType : 'json',
 				body: new FormData(form)
 			}, function (code, responseText) {
 				if(code==200) {
-					result.innerHTML = responseText;
+					result.innerHTML = responseText.answer;
+					latestQuestionsWrapper.innerHTML = '';
+					JSON.parse(responseText.last_questions).forEach(function(ans){
+						var li = document.createElement('LI');
+						li.innerHTML = '<a href="#">'+ans.text+'</a>';
+						latestQuestionsWrapper.appendChild(li);
+					});
+					attachLatestQuestionsEvents();
 				} else {
 					result.innerHTML = code;
 				}
@@ -62,15 +81,7 @@
 			return false;
 		});
 
-		var latestQuestions = document.querySelectorAll('.last_questions__list a');
-
-		Array.prototype.forEach.call(latestQuestions,function(el) {
-			el.addEventListener('click', function(e){
-				e.preventDefault();
-				input.value = el.innerHTML;
-				sendForm();
-			});
-		})
+		attachLatestQuestionsEvents();
 
 
 		if(window.hasOwnProperty('webkitSpeechRecognition')) {
