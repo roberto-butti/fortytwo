@@ -7,3 +7,6 @@ WEB_DIR="/var/www/h-bot.dev.h-art.it/htdocs/"
 
 deploy:
 	rsync -rlpcgoDvzi --delete . ${SSH_ALIAS_CONFIG}:${WEB_DIR} --exclude-from 'exclude-list.txt'
+
+build-css:
+	sass sass/style.scss static/build/css/style.css

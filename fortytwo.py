@@ -26,7 +26,7 @@ app.config.update(dict(
     MONGO_PORT='27017',
     MONGO_DBNAME='fortytwo'
 ))
-app.config.from_envvar('FLASKR_SETTINGS', silent=True)
+app.config.from_envvar('FORTYTWO_SETTINGS', silent=True)
 
 conn = MongoClient()
 db = conn.fortytwo
@@ -63,8 +63,8 @@ class TrainingsetForm(form.Form):
     answer = fields.StringField('Answer')
 
 class TrainingsetView(ModelView):
-    column_list = ('text', 'answer')
-    column_sortable_list = ('text', 'answer')
+    column_list = ('question', 'answer')
+    column_sortable_list = ('question', 'answer')
     form = TrainingsetForm
 
 class AnswerForm(form.Form):
@@ -86,7 +86,8 @@ def index():
 @app.route('/send', methods=['POST'])
 def send():
     text = request.form["text"]
-    answer_key = engine(request.form["text"])
+    answer_key = enginemongo(request.form["text"])
+    print("----",answer_key,"---")
     question = {
         "text": text,
         "date": datetime.datetime.utcnow(),
@@ -100,22 +101,44 @@ def send():
     }
     q_id = db.questions.insert_one(question).inserted_id
     a = db.answers.find_one({"key":answer_key})
-
-    return a["answer"]
+    answer = ""
+    if a == None:
+        answer = "Non ho capito"
+    else:
+        answer = a["answer"]
+    return answer
 
 def enginemongo(text):
     from textblob.classifiers import NaiveBayesClassifier
     trainingset = db.trainingset.find()
+    tsarr = []
     for t in trainingset:
-        t.text
+        tsarr.append((t["question"], t["answer"]))
 
-
+    print(tsarr)
+    cl = NaiveBayesClassifier(tsarr)
+    prob_dist = cl.prob_classify(text)
+    print("TEST:", text, " ", prob_dist, " ", prob_dist.max())
+    maxprob=0
+    maxanswer=""
+    for a in prob_dist.samples():
+        pd = round(prob_dist.prob(a), 2)
+        if ( pd> maxprob):
+            maxprob = pd
+            maxanswer = a
+        print(a, ":", round(prob_dist.prob(a), 2))
+    print(cl.show_informative_features())
+    aa = cl.extract_features(text)
+    print(aa)
+    print("---------------------------------------")
+    return prob_dist.max()
+    #return cl.classify(text)
 
 def engine(text):
     from textblob.classifiers import NaiveBayesClassifier
     from textblob.classifiers import MaxEntClassifier
     from textblob.classifiers import NLTKClassifier
-    url_train = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQv20P4oKek-rqSJy_2QLKoNOBEeeLQeIP9rZ7FNYftNkgKXw_WIfJRfw5ptYv3HICzWSnyXWTWPLDe/pub?gid=0&single=true&output=csv"
+    url_train = "https://"
     file_train = "train.csv"
     if not (os.path.isfile(file_train)):
         with open(file_train, 'wb') as handle:
@@ -144,10 +167,7 @@ def engine(text):
     # print(cl.accuracy(test))
 
     prob_dist = cl.prob_classify(text)
-    print("TEST:", text, " ", prob_dist, " ", prob_dist.max(), " ",
-          round(prob_dist.prob("listacompa"), 2), " ",
-          round(prob_dist.prob("permessi"), 2),
-        round(prob_dist.prob("ipaddress"), 2))
+    print("TEST:", text, " ", prob_dist, " ", prob_dist.max())
     for a in prob_dist.samples():
         print(a, ":",round(prob_dist.prob(a), 2))
     print(cl.show_informative_features())

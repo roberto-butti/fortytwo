@@ -3,5 +3,6 @@ Makefile.*
 .gitignore
 /venv
 /sass
-.idea
-__pycache__/
+/.idea
+/__pycache__/
+/.sass-cache/
