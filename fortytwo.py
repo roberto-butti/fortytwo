@@ -90,7 +90,8 @@ def index():
 @app.route('/send', methods=['POST'])
 def send():
     text = request.form["text"]
-    answer_key = enginemongo(request.form["text"])
+    answerv = enginemongo(request.form["text"])
+    answer_key= answerv["answer_key"]
     print("----",answer_key,"---")
     question = {
         "text": text,
@@ -111,7 +112,7 @@ def send():
     else:
         answer = a["answer"]
     last_questions = db.questions.find().sort("timestamp", pymongo.DESCENDING).limit(3)
-    return jsonify(answer =answer, last_questions = dumps(last_questions))
+    return jsonify(answer =answer, last_questions = dumps(last_questions), answer_prob = answerv["answer_prob"])
 
 def enginemongo(text):
     from textblob.classifiers import NaiveBayesClassifier
@@ -133,10 +134,11 @@ def enginemongo(text):
             maxanswer = a
         print(a, ":", round(prob_dist.prob(a), 2))
     print(cl.show_informative_features())
+    print("RISPOSTA:",maxanswer, " --- ",maxprob)
     aa = cl.extract_features(text)
     print(aa)
     print("---------------------------------------")
-    return prob_dist.max()
+    return {"answer_key":maxanswer, "answer_prob":maxprob}
     #return cl.classify(text)
 
 def engine(text):
