@@ -59,6 +59,7 @@
 				body: new FormData(form)
 			}, function (code, responseText) {
 				if(code==200) {
+					result.style.display = 'block';
 					result.innerHTML = responseText.answer;
 					latestQuestionsWrapper.innerHTML = '';
 					JSON.parse(responseText.last_questions).forEach(function(ans){
