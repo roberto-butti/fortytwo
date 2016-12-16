@@ -3,16 +3,10 @@ a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,canvas,c
 html,body {
 	margin:0;
 	padding :0;
-	text-transform: uppercase;
 	font-family: Arial, sans-serif;
 }
 
 .wrapper {
-	// display: flex;
-	// height: 100%;
-	// flex-direction : column;
-	// justify-content: center;
-	// align-items: center;
 	margin: 0 auto;
 	max-width: 600px;
 	padding: 0 20px;
@@ -31,8 +25,6 @@ html,body {
 		text-align: center;
 		line-height: 69px;
 		color: #fff;
-		// letter-spacing: -1px;
-
 	}
 
 	.searchform {
@@ -111,6 +103,33 @@ html,body {
 		}
 	}
 	.result {
+		padding: 40px 20px;
+		font-size: 25px;
+		color: #292929;
+	}
+	.last_questions {
+		border-top: 1px solid #ccc;
 		padding: 20px;
+		strong {
+			text-transform: uppercase;
+			display: block;
+			font-size: 18px;
+			line-height: 25px;
+			margin-bottom: 10px;
+			color: #333;
+		}
+		li {
+			margin-bottom: 7px;
+		}
+		a {
+			text-decoration: underline;			
+			color: #4e8799;
+			cursor: pointer;
+			&:after {
+				content:'\00bb';
+				display: inline-block;
+				padding-left: 3px;
+			}
+		}
 	}
 }
