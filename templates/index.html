@@ -51,6 +51,11 @@
 			})
 		}
 
+		var getResultColor = function(prob) {
+			var color = 'rgba('+Math.round((1-prob)*255)+','+Math.round(prob*255)+',0,1)';
+			return color;
+		}
+
 		var sendForm = function() {
 			nanoajax.ajax({
 				url:formUrl,
@@ -60,6 +65,7 @@
 			}, function (code, responseText) {
 				if(code==200) {
 					result.style.display = 'block';
+					result.style.color = getResultColor(responseText.answer_prob);
 					result.innerHTML = responseText.answer;
 					latestQuestionsWrapper.innerHTML = '';
 					JSON.parse(responseText.last_questions).forEach(function(ans){
