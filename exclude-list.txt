@@ -1,0 +1,7 @@
+exclude-list.txt
+Makefile.*
+.gitignore
+/venv
+/sass
+.idea
+__pycache__/

@@ -1,0 +1,7 @@
+/venv
+/static/build
+/h-bot.wsgi
+/test.py
+/train.csv
+/__pycache__
+/.idea
