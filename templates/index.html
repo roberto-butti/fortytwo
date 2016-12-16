@@ -8,7 +8,7 @@
 </head>
 <body>
 	<div class="wrapper">
-		<form class="searchform" action="">
+		<form class="searchform" action="" autocomplete="off">
 			<h1>42</h1>
 			<div class="searchform__wrapper">
 				<input name="text" type="text" autofocus="true"  class="main-input">
@@ -17,9 +17,12 @@
 			</div>
 			<div class="result"></div>
 			<div class="last_questions">
-				{% for q in last_questions %}
-				<div class=question>{{ q.text }}</div>
-				{% endfor %}
+				<strong>Domande frequenti</strong>
+				<ul class="last_questions__list">
+					{% for q in last_questions %}
+					<li class=question><a href="#">{{ q.text }}</a></li>
+					{% endfor %}
+				</ul>
 			</div>
 		</form>
 	</div>
@@ -58,6 +61,16 @@
 			sendForm();
 			return false;
 		});
+
+		var latestQuestions = document.querySelectorAll('.last_questions__list a');
+
+		Array.prototype.forEach.call(latestQuestions,function(el) {
+			el.addEventListener('click', function(e){
+				e.preventDefault();
+				input.value = el.innerHTML;
+				sendForm();
+			});
+		})
 
 
 		if(window.hasOwnProperty('webkitSpeechRecognition')) {
