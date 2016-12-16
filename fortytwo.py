@@ -2,9 +2,13 @@ import os
 from flask import Flask, request, session, g, redirect, url_for, abort, render_template, flash
 #from flask_pymongo import PyMongo
 import flask_admin as admin
-from pymongo import MongoClient
+#from pymongo import MongoClient
+import pymongo
 import requests
 import datetime
+from flask import jsonify
+from bson.json_util import dumps
+
 
 from wtforms import form, fields
 
@@ -28,7 +32,7 @@ app.config.update(dict(
 ))
 app.config.from_envvar('FORTYTWO_SETTINGS', silent=True)
 
-conn = MongoClient()
+conn = pymongo.MongoClient()
 db = conn.fortytwo
 
 
@@ -79,7 +83,7 @@ class AnswerView(ModelView):
 
 @app.route('/')
 def index():
-    last_questions= db.questions.find().sort("timestamp",-1).limit(3)
+    last_questions= db.questions.find().sort("timestamp",pymongo.DESCENDING).limit(3)
     return render_template('index.html',last_questions=last_questions)
 
 
@@ -106,7 +110,8 @@ def send():
         answer = "Non ho capito"
     else:
         answer = a["answer"]
-    return answer
+    last_questions = db.questions.find().sort("timestamp", pymongo.DESCENDING).limit(3)
+    return jsonify(answer =answer, last_questions = dumps(last_questions))
 
 def enginemongo(text):
     from textblob.classifiers import NaiveBayesClassifier
