@@ -8,6 +8,8 @@ import requests
 import datetime
 from flask import jsonify
 from bson.json_util import dumps
+from wtforms import TextAreaField
+from wtforms.widgets import TextArea
 
 
 from wtforms import form, fields
@@ -38,7 +40,16 @@ db = conn.fortytwo
 
 
 
+class CKTextAreaWidget(TextArea):
+    def __call__(self, field, **kwargs):
+        if kwargs.get('class'):
+            kwargs['class'] += ' ckeditor'
+        else:
+            kwargs.setdefault('class', 'ckeditor')
+        return super(CKTextAreaWidget, self).__call__(field, **kwargs)
 
+class CKTextAreaField(TextAreaField):
+    widget = CKTextAreaWidget()
 
 
 
@@ -72,18 +83,24 @@ class TrainingsetView(ModelView):
     form = TrainingsetForm
 
 class AnswerForm(form.Form):
+
     key = fields.StringField('key')
-    answer = fields.StringField('Answer')
+    answer = fields.TextAreaField('Answer')
 
 class AnswerView(ModelView):
+    form_overrides = {
+        'answer': CKTextAreaField
+    }
     column_list = ('key', 'answer')
     column_sortable_list = ('key', 'answer')
     form = AnswerForm
+    create_template = 'ckeditor.html'
+    edit_template = 'ckeditor.html'
 
 
 @app.route('/')
 def index():
-    last_questions= db.questions.find().sort("timestamp",pymongo.DESCENDING).limit(3)
+    last_questions= db.questions.find().sort("date",pymongo.DESCENDING).limit(3)
     return render_template('index.html',last_questions=last_questions)
 
 
@@ -111,7 +128,7 @@ def send():
         answer = "Non ho capito"
     else:
         answer = a["answer"]
-    last_questions = db.questions.find().sort("timestamp", pymongo.DESCENDING).limit(3)
+    last_questions = db.questions.find().sort("date", pymongo.DESCENDING).limit(3)
     return jsonify(answer =answer, last_questions = dumps(last_questions), answer_prob = answerv["answer_prob"])
 
 def enginemongo(text):
