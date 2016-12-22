@@ -104,11 +104,27 @@ html,body {
 	}
 	.result {
 		display: none;
-		padding: 40px 20px;
-		font-size: 25px;
+		padding: 40px 60px 20px 20px;
+		font-size: 22px;
 		line-height: 30px;
 		color: #292929;
-		text-align: center;
+		text-align: left;
+		background-size: 40px 40px;
+		background-repeat: no-repeat;
+		background-position: right 30px;
+		a {
+			text-transform: none;
+			color: inherit;
+		}
+		&.sure {
+			background-image: url('../images/sure.png');
+		}
+		&.neutral {
+			background-image: url('../images/neutral.png');	
+		}
+		&.confused {
+			background-image: url('../images/confused.png');
+		}
 	}
 	.last_questions {
 		border-top: 1px solid #ccc;

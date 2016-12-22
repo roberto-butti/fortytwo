@@ -1,5 +1,5 @@
 /venv
-/static/build
+/static/build/css
 /h-bot.wsgi
 /test.py
 /train.csv

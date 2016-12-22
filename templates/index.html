@@ -52,8 +52,25 @@
 		}
 
 		var getResultColor = function(prob) {
+			console.log(prob);
 			var color = 'rgba('+Math.round((1-prob)*255)+','+Math.round(prob*255)+',0,1)';
 			return color;
+		}
+
+		var addResultClass = function(prob) {
+			console.log(prob);
+			var className;
+
+			if(prob >= 0.8) {
+				className = 'sure';
+			} else if(prob > 0.5) {
+				className = 'neutral';
+			} else {
+				className = 'confused';
+			}
+
+			result.classList.add(className);
+			
 		}
 
 		var sendForm = function() {
@@ -65,7 +82,7 @@
 			}, function (code, responseText) {
 				if(code==200) {
 					result.style.display = 'block';
-					result.style.color = getResultColor(responseText.answer_prob);
+					addResultClass(responseText.answer_prob);
 					result.innerHTML = responseText.answer;
 					latestQuestionsWrapper.innerHTML = '';
 					JSON.parse(responseText.last_questions).forEach(function(ans){
@@ -81,6 +98,7 @@
 		}
 
 		form.addEventListener('submit',function(e) {
+			result.classList.remove('sure','neutral','confused');
 			result.innerHTML = '';
 			e.preventDefault();
 			form.classList.add("sending");
