@@ -6,3 +6,4 @@ Makefile.*
 /.idea
 /__pycache__/
 /.sass-cache/
+*.zip
